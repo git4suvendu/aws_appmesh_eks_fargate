@@ -246,7 +246,7 @@ YAML
 
 # https://github.com/hashicorp/terraform-provider-kubernetes-alpha/issues/199#issuecomment-832614387
 
-
+/*
  
 resource "kubernetes_manifest" "kubernetes-secret-store" {
   manifest = {
@@ -274,6 +274,7 @@ resource "kubernetes_manifest" "kubernetes-secret-store" {
   }
 }
  
+ */
  
 # We will now create our ExternalSecret resource, specifying the secret we want to access and referencing the previously created SecretStore object. 
 # We will specify the existing AWS Secrets Manager secret name and keys.
@@ -309,7 +310,7 @@ YAML
 
 */
 
- 
+ /*
  
 resource "kubernetes_manifest" "kubernetes-external-secret" {
   manifest = {
@@ -345,4 +346,4 @@ resource "kubernetes_manifest" "kubernetes-external-secret" {
   }
 }
  
- 
+ */
