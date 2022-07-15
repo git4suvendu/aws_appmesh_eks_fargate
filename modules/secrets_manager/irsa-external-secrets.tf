@@ -1,6 +1,6 @@
 
 
-
+/*
 resource "kubernetes_namespace" "external_secrets" {
   metadata {
     labels = {
@@ -12,7 +12,7 @@ resource "kubernetes_namespace" "external_secrets" {
     name =  var.k8s_namespace
   }
 }
-
+*/
 
 resource "aws_iam_role" "this" {
   name        = local.service_account_name
@@ -78,7 +78,7 @@ resource "kubernetes_service_account" "this" {
     }
   }
 
-   depends_on = [ kubernetes_namespace.external_secrets  ]
+ #  depends_on = [ kubernetes_namespace.external_secrets  ]
 
 }
 
@@ -162,7 +162,7 @@ resource "kubernetes_cluster_role_binding" "this" {
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
 
-   depends_on = [ kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
-   
+   depends_on = [ /* kubernetes_namespace.external_secrets,*/ kubernetes_service_account.this ]
+
 }
 
