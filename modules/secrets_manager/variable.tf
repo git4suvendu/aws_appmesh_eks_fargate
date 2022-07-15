@@ -7,6 +7,11 @@ variable "k8s_cluster_name" {
   type        = string
 }
  
+ variable "k8s_namespace" {
+  description = "Kubernetes namespace to deploy the External Secrets"
+  type        = string
+  default     = "default"
+}
 
 variable "aws_vpc_id" {
   description = "ID of the Virtual Private Network to utilize. Can be ommited if targeting EKS."

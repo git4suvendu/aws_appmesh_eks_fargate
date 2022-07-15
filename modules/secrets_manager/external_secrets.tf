@@ -3,9 +3,7 @@
 # Reference: https://aws.amazon.com/blogs/containers/leverage-aws-secrets-stores-from-eks-fargate-with-external-secrets-operator/
 
 
-
-
- /*
+ 
 resource "kubernetes_namespace" "external_secrets" {
   metadata {
     labels = {
@@ -14,10 +12,10 @@ resource "kubernetes_namespace" "external_secrets" {
       "app.kubernetes.io/managed-by" = "helm" #"terraform"
       "meta.helm.sh/release-name"   = "external_secrets"
     }
-    name = "external-secrets" #var.k8s_namespace
+    name =  var.k8s_namespace
   }
 }
-*/ 
+ 
 
 
 # Deploying External Secrets Operator / Controller using Helm 
@@ -27,7 +25,7 @@ resource "helm_release" "external_secrets" {
   repository = local.external_secrets_helm_repo
   chart      = local.external_secrets_chart_name
   version    = local.external_secrets_chart_version
-  namespace  = "external-secrets" # var.k8s_namespace
+  namespace  =  var.k8s_namespace
   create_namespace = true
   atomic     = true
   timeout    = 900
@@ -42,7 +40,28 @@ resource "helm_release" "external_secrets" {
       value = "9443"
       type = "auto"
   } 
+
+  set {
+      name = "clusterName"
+      value = var.k8s_cluster_name
+      type = "string"
+  }
+  set {
+      name = "serviceAccount.create"
+      value = "false"
+      type = "auto"
+  }
+  set {
+      name = "serviceAccount.name"
+      value = kubernetes_service_account.this.metadata[0].name
+      type = "string"
+  }
+  set {
+      name = "region"
+      value = local.aws_region_name
+      type = "string"
+  }
   
- # depends_on = [ kubernetes_namespace.external_secrets ]
+  depends_on = [ kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
 }
 
