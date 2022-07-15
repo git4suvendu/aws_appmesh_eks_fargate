@@ -244,7 +244,7 @@ apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
   name: "${var.k8s_cluster_name}-external-secret"
-  namespace =  ${var.app_namespace}
+  namespace:  ${var.app_namespace}
 spec:
   refreshInterval: 1h
   secretStoreRef:
