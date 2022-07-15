@@ -35,7 +35,7 @@ apiVersion: external-secrets.io/v1beta1
 kind: SecretStore
 metadata:
   name: "${var.k8s_cluster_name}-common-secret-store"
-  namespace =  ${var.app_namespace}
+  namespace:  ${var.app_namespace}
 spec:
   provider:
     aws:
