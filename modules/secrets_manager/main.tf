@@ -1,59 +1,17 @@
 
-# Deploy External Secrets Operator
-# Reference: https://aws.amazon.com/blogs/containers/leverage-aws-secrets-stores-from-eks-fargate-with-external-secrets-operator/
 
-locals {
-  external_secrets_helm_repo     = "https://charts.external-secrets.io"
-  external_secrets_chart_name    = "external-secrets"
-  aws_vpc_id                   = data.aws_vpc.selected.id
-  aws_region_name              = data.aws_region.current.name
-  external_secrets_chart_version = "0.5.8"
-  service_account_name         = substr("${var.k8s_cluster_name}-external-secrets",0,64)
-}
-
-
-/*
-resource "kubernetes_namespace" "external_secrets" {
-  metadata {
-    labels = {
-      "app.kubernetes.io/name"       = local.service_account_name
-      "app.kubernetes.io/component"  = "external_secrets"
-      "app.kubernetes.io/managed-by" = "helm" #"terraform"
-      "meta.helm.sh/release-name"   = "external_secrets"
+terraform {
+  required_providers {
+    kubectl = {
+      source = "gavinbunney/kubectl"
+      version = "1.14.0"
     }
-    name = var.k8s_namespace
   }
 }
-*/
 
-
-# Deploying External Secrets Operator / Controller using Helm 
-resource "helm_release" "external_secrets" {
-
-  name       = "external-secrets"
-  repository = local.external_secrets_helm_repo
-  chart      = local.external_secrets_chart_name
-  version    = local.external_secrets_chart_version
-  namespace  = var.k8s_namespace
-  create_namespace = true
-  atomic     = true
-  timeout    = 900
-  cleanup_on_fail = true
-  set {
-      name = "installCRDs"
-      value = "true"
-      type = "auto"
-  }
-  set {
-      name = "webhook.port"
-      value = "9443"
-      type = "auto"
-  } 
-  
- # depends_on = [ kubernetes_namespace.external_secrets ]
+provider "kubectl" {
+  # Configuration options
 }
-
-
 
 /*
 resource "kubernetes_namespace" "application_namespace" {
@@ -222,7 +180,7 @@ resource "kubernetes_cluster_role_binding" "this" {
 # Creating Kubernetes SecretStore in the cluster so that Secrets can synchronise from AWS Secrets Manager
 # Once Secrets are synchronised Pods can use the secrets within the cluster
 
-/*
+ 
 resource "kubectl_manifest" "kubernetes-secret-store" {
     yaml_body = <<YAML
 apiVersion: external-secrets.io/v1beta1
@@ -242,7 +200,7 @@ spec:
 YAML
 }
 
-*/
+ 
 
 # https://github.com/hashicorp/terraform-provider-kubernetes-alpha/issues/199#issuecomment-832614387
 
@@ -279,7 +237,7 @@ resource "kubernetes_manifest" "kubernetes-secret-store" {
 # We will now create our ExternalSecret resource, specifying the secret we want to access and referencing the previously created SecretStore object. 
 # We will specify the existing AWS Secrets Manager secret name and keys.
 
-/*
+ 
 resource "kubectl_manifest" "kubernetes-external-secret" {
     yaml_body = <<YAML
 apiVersion: external-secrets.io/v1beta1
@@ -308,7 +266,7 @@ YAML
 }
 
 
-*/
+ 
 
  /*
  

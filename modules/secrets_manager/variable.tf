@@ -6,12 +6,7 @@ variable "k8s_cluster_name" {
   description = "Name of the Kubernetes cluster. This string is used to contruct the AWS IAM permissions and roles. If targeting EKS, the corresponsing managed cluster name must match as well."
   type        = string
 }
-
-variable "k8s_namespace" {
-  description = "Kubernetes namespace to deploy the External Secrets into."
-  type        = string
-  default     = "default"
-}
+ 
 
 variable "aws_vpc_id" {
   description = "ID of the Virtual Private Network to utilize. Can be ommited if targeting EKS."
