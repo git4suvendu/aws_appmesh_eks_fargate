@@ -3,19 +3,8 @@
 # Reference: https://aws.amazon.com/blogs/containers/leverage-aws-secrets-stores-from-eks-fargate-with-external-secrets-operator/
 
 
- 
-resource "kubernetes_namespace" "external_secrets" {
-  metadata {
-    labels = {
-      "app.kubernetes.io/name"       = local.service_account_name
-      "app.kubernetes.io/component"  = "external_secrets"
-      "app.kubernetes.io/managed-by" = "helm" #"terraform"
-      "meta.helm.sh/release-name"   = "external_secrets"
-    }
-    name =  var.k8s_namespace
-  }
-}
- 
+
+
 
 
 # Deploying External Secrets Operator / Controller using Helm 

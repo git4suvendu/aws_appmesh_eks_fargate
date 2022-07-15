@@ -1,6 +1,19 @@
 
 
 
+resource "kubernetes_namespace" "external_secrets" {
+  metadata {
+    labels = {
+      "app.kubernetes.io/name"       = local.service_account_name
+      "app.kubernetes.io/component"  = "external_secrets"
+      "app.kubernetes.io/managed-by" = "helm" #"terraform"
+      "meta.helm.sh/release-name"   = "external_secrets"
+    }
+    name =  var.k8s_namespace
+  }
+}
+
+
 resource "aws_iam_role" "this" {
   name        = local.service_account_name
   description = "Permissions required by the Kubernetes External Secrets to do its job."
@@ -64,6 +77,9 @@ resource "kubernetes_service_account" "this" {
       "meta.helm.sh/release-namespace" =var.k8s_namespace
     }
   }
+
+   depends_on = [ kubernetes_namespace.external_secrets  ]
+
 }
 
 resource "kubernetes_cluster_role" "this" {
@@ -145,5 +161,8 @@ resource "kubernetes_cluster_role_binding" "this" {
     name      = kubernetes_service_account.this.metadata[0].name
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
+
+   depends_on = [ kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
+   
 }
 
