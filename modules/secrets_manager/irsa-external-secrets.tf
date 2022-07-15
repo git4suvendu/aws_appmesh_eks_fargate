@@ -62,7 +62,7 @@ resource "kubernetes_service_account" "this" {
   automount_service_account_token = true
   metadata {
     name      =  local.service_account_name
-    namespace =  var.k8s_namespace
+    namespace =  var.app_namespace #var.k8s_namespace
     annotations = {
       # This annotation is only used when running on EKS which can
       # use IAM roles for service accounts.
