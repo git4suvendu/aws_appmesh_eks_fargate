@@ -103,6 +103,6 @@ module "kubernetes_app_helm" {
     source                      =  "./modules/kubernetes-app-helm"
     app_namespace               =  var.fargate_app_namespace[0]
 
-  depends_on = [module.eks, module.aws_alb_controller, module.secrets_manager]
+  depends_on = [module.eks, module.aws_alb_controller, module.external_secrets]
 }
 
