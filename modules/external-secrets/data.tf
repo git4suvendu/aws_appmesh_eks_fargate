@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
       test     = "StringEquals"
       variable = "${replace(data.aws_eks_cluster.selected[0].identity[0].oidc[0].issuer, "https://", "")}:sub"
       values = [
-        "system:serviceaccount:${var.k8s_namespace}:${local.service_account_name}"
+        "system:serviceaccount:${var.app_namespace}:${local.service_account_name}"
       ]
     }
     principals {
