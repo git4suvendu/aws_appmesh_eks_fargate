@@ -150,7 +150,7 @@ resource "kubernetes_cluster_role_binding" "this" {
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
 
-   depends_on = [  kubernetes_namespace.application_namespace, kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
+ #  depends_on = [  kubernetes_namespace.application_namespace, kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
 
 }
 
