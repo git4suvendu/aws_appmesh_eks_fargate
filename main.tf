@@ -79,6 +79,13 @@ module "aws_appmesh_controller" {
   depends_on =  [module.eks, module.coredns_patching]  
 }
 
+module "external_secrets" {
+  source  = "./modules/external-secrets"
+  k8s_namespace    =  "external-secrets"
+  app_namespace  =  var.fargate_app_namespace[0]
+  k8s_cluster_name = module.eks.eks_cluster_name
+  depends_on =  [module.eks, module.coredns_patching]  
+}
 
 
 /*
@@ -87,7 +94,7 @@ module "kubernetes_app" {
     source                      =  "./modules/kubernetes-app"
     app_namespace               =  var.fargate_app_namespace[0]
 
-  depends_on = [module.eks, module.aws_alb_controller]
+  depends_on = [module.eks, module.aws_alb_controller,  module.secrets_manager]
 }
 
 */
@@ -96,6 +103,6 @@ module "kubernetes_app_helm" {
     source                      =  "./modules/kubernetes-app-helm"
     app_namespace               =  var.fargate_app_namespace[0]
 
-  depends_on = [module.eks, module.aws_alb_controller]
+  depends_on = [module.eks, module.aws_alb_controller, module.external_secrets]
 }
 

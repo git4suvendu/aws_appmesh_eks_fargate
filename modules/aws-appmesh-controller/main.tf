@@ -78,6 +78,9 @@ resource "kubernetes_service_account" "this" {
       "meta.helm.sh/release-namespace" = var.k8s_namespace
     }
   }
+
+     depends_on = [ kubernetes_namespace.appmesh_namespace  ]
+
 }
 
 resource "kubernetes_cluster_role" "this" {
@@ -162,6 +165,7 @@ resource "kubernetes_cluster_role_binding" "this" {
     name      = kubernetes_service_account.this.metadata[0].name
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
+  depends_on = [ kubernetes_namespace.appmesh_namespace, kubernetes_service_account.this ]
 }
 
 resource "helm_release" "appmesh-controller" {

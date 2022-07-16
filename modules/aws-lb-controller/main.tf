@@ -139,6 +139,9 @@ resource "kubernetes_cluster_role_binding" "this" {
     name      = kubernetes_service_account.this.metadata[0].name
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
+
+  depends_on = [ kubernetes_service_account.this ]
+
 }
 
 resource "helm_release" "alb_controller" {
@@ -183,6 +186,9 @@ resource "helm_release" "alb_controller" {
       value =   var.enable_host_networking
       type = "auto"
   }
+
+  depends_on = [ kubernetes_service_account.this ]
+
 }
 
 

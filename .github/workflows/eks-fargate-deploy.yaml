@@ -5,7 +5,7 @@ on:
     paths:
       - '*/**'
   pull_request:
-    branches: [ master ]
+    branches: [ secrets-manager ]
 #defaults:
 #  run:
 #    shell: bash
