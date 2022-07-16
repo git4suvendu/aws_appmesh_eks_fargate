@@ -79,7 +79,7 @@ module "aws_appmesh_controller" {
   depends_on =  [module.eks, module.coredns_patching]  
 }
 
-module "secrets_manager" {
+module "external_secrets" {
   source  = "./modules/external-secrets"
   k8s_namespace    =  "external-secrets"
   app_namespace  =  var.fargate_app_namespace[0]

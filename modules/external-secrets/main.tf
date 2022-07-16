@@ -33,9 +33,10 @@ spec:
         jwt:
           serviceAccountRef:
             name: ${local.service_account_name}
+            namespace: ${var.k8s_namespace}
 YAML
 
-depends_on = [ kubernetes_namespace.application_namespace, helm_release.external_secrets ]
+depends_on = [ kubernetes_namespace.application_namespace, kubernetes_namespace.external_secrets, helm_release.external_secrets ]
 }
 
  
@@ -102,7 +103,7 @@ spec:
       property: "app_password" #AWS Secrets Manager secret key
 YAML
 
-depends_on = [ kubernetes_namespace.application_namespace, helm_release.external_secrets ]
+depends_on = [ kubernetes_namespace.application_namespace, kubernetes_namespace.external_secrets, helm_release.external_secrets ]
 
 }
 

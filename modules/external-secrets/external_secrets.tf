@@ -40,6 +40,19 @@ resource "helm_release" "external_secrets" {
       value = local.aws_region_name
       type = "string"
   }
+
+  set {
+      name = "serviceAccount.create"
+      value = "false"
+      type = "auto"
+  }
+  set {
+      name = "serviceAccount.name"
+      value = kubernetes_service_account.this.metadata[0].name
+      type = "string"
+  }
   
+  depends_on = [ kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
+
 }
 

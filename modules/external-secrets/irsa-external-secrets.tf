@@ -1,29 +1,7 @@
 
 
-/*
-resource "kubernetes_namespace" "external_secrets" {
-  metadata {
-    labels = {
-      "app.kubernetes.io/name"       = local.service_account_name
-      "app.kubernetes.io/component"  = "external_secrets"
-      "app.kubernetes.io/managed-by" = "helm" #"terraform"
-      "meta.helm.sh/release-name"   = "external_secrets"
-    }
-    name =  var.k8s_namespace
-  }
-}
-*/
+ 
 
-resource "kubernetes_namespace" "application_namespace" {
-  metadata {
-    labels = {
-      "app.kubernetes.io/name"       = "application_namespace"
-      "app.kubernetes.io/component"  = "business_application"
-      "app.kubernetes.io/managed-by" = "terraform" # "helm" #
-    }
-    name = var.app_namespace #var.k8s_namespace
-  }
-}
  
 
 resource "aws_iam_role" "this" {
@@ -60,8 +38,6 @@ resource "aws_iam_policy" "this" {
         }
   }
 
-
-
 resource "aws_iam_role_policy_attachment" "this" {
   policy_arn = aws_iam_policy.this.arn
   role       = aws_iam_role.this.name
@@ -74,7 +50,7 @@ resource "kubernetes_service_account" "this" {
   automount_service_account_token = true
   metadata {
     name      =  local.service_account_name
-    namespace =  var.app_namespace #var.k8s_namespace
+    namespace =  var.k8s_namespace #var.app_namespace #
     annotations = {
       # This annotation is only used when running on EKS which can
       # use IAM roles for service accounts.
@@ -174,7 +150,7 @@ resource "kubernetes_cluster_role_binding" "this" {
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
 
-   depends_on = [  kubernetes_namespace.application_namespace,  kubernetes_service_account.this ]
+   depends_on = [  kubernetes_namespace.application_namespace, kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
 
 }
 
