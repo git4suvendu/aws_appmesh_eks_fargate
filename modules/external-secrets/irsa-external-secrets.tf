@@ -66,7 +66,7 @@ resource "kubernetes_service_account" "this" {
     }
   }
 
-   depends_on = [ kubernetes_namespace.application_namespace , helm_release.external_secrets ]
+   depends_on = [ kubernetes_namespace.application_namespace   ]
 
 }
 
