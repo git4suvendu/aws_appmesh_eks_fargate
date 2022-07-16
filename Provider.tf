@@ -13,6 +13,7 @@ provider "aws" {
      Owner_Location     = "UK"
      Environment =  var.environment
      Resource_Region = var.region_name
+     EKS_Cluster_Name = "${var.cluster_name}-${var.environment}"
    }
  }
 }
