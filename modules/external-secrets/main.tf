@@ -1,8 +1,15 @@
  
+
+resource "time_sleep" "wait_60_seconds_for_external_secret_controller" {
+  create_duration = "60s"
+  depends_on = [helm_release.external_secrets]
+}
+
 # Creating Kubernetes SecretStore in the cluster so that Secrets can synchronise from AWS Secrets Manager
 # Once Secrets are synchronised Pods can use the secrets within the cluster
 
- 
+
+
 resource "kubectl_manifest" "kubernetes-secret-store" {
     yaml_body = <<YAML
 apiVersion: external-secrets.io/v1beta1
@@ -21,7 +28,11 @@ spec:
             name: ${local.service_account_name}
 YAML
 
-depends_on = [ kubernetes_namespace.application_namespace, helm_release.external_secrets , kubernetes_service_account.this  ]
+depends_on = [  kubernetes_namespace.application_namespace, 
+                helm_release.external_secrets , 
+                kubernetes_service_account.this, 
+                time_sleep.wait_60_seconds_for_external_secret_controller  
+                ]
 }
 
  
@@ -30,6 +41,12 @@ depends_on = [ kubernetes_namespace.application_namespace, helm_release.external
 # We will now create our ExternalSecret resource, specifying the secret we want to access and referencing the previously created SecretStore object. 
 # We will specify the existing AWS Secrets Manager secret name and keys.
 
+
+resource "time_sleep" "wait_30_seconds_for_secret_store" {
+  create_duration = "30s"
+  depends_on = [kubectl_manifest.kubernetes-secret-store]
+}
+ 
  
 resource "kubectl_manifest" "kubernetes-external-secret" {
     yaml_body = <<YAML
@@ -57,7 +74,7 @@ spec:
       property: "app_password" #AWS Secrets Manager secret key
 YAML
 
-depends_on = [ kubectl_manifest.kubernetes-secret-store ]
+depends_on = [ kubectl_manifest.kubernetes-secret-store , time_sleep.wait_30_seconds_for_secret_store  ]
 
 }
 

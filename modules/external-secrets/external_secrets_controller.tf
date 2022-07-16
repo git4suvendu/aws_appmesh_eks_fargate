@@ -1,13 +1,9 @@
 
-# Deploy External Secrets Operator
+# Deploy External Secrets Operator/Controller
 # Reference: https://aws.amazon.com/blogs/containers/leverage-aws-secrets-stores-from-eks-fargate-with-external-secrets-operator/
 
 
-
-
-
-
-# Deploying External Secrets Operator / Controller using Helm 
+# Deploying External Secrets Operator/Controller using Helm 
 resource "helm_release" "external_secrets" {
 
   name       = "external-secrets"
@@ -40,8 +36,7 @@ resource "helm_release" "external_secrets" {
       value = local.aws_region_name
       type = "string"
   }
-  
- # depends_on = [ kubernetes_namespace.external_secrets  ]
+ 
 
 }
 
