@@ -1,18 +1,4 @@
-
-
-terraform {
-  required_providers {
-    kubectl = {
-      source = "gavinbunney/kubectl"
-      version = "1.14.0"
-    }
-  }
-}
  
-
- 
-
-
 # Creating Kubernetes SecretStore in the cluster so that Secrets can synchronise from AWS Secrets Manager
 # Once Secrets are synchronised Pods can use the secrets within the cluster
 
@@ -40,37 +26,6 @@ depends_on = [ kubernetes_namespace.application_namespace, helm_release.external
 
  
 
-# https://github.com/hashicorp/terraform-provider-kubernetes-alpha/issues/199#issuecomment-832614387
-
-/*
- 
-resource "kubernetes_manifest" "kubernetes-secret-store" {
-  manifest = {
-    apiVersion = "external-secrets.io/v1beta1"
-    kind       = "SecretStore"
-      metadata = {
-          name = "${var.k8s_cluster_name}-common-secret-store"
-          namespace =  var.app_namespace
-      }
-      spec = {
-          provider = {
-            aws = {
-              service = "SecretsManager"
-              region = local.aws_region_name
-              auth = {
-                jwt = {
-                  serviceAccountRef = {
-                    name = local.service_account_name
-                  }
-                }
-              }
-            }
-          }
-      }
-  }
-}
- 
- */
  
 # We will now create our ExternalSecret resource, specifying the secret we want to access and referencing the previously created SecretStore object. 
 # We will specify the existing AWS Secrets Manager secret name and keys.
@@ -106,6 +61,39 @@ depends_on = [ kubectl_manifest.kubernetes-secret-store ]
 
 }
 
+
+
+# https://github.com/hashicorp/terraform-provider-kubernetes-alpha/issues/199#issuecomment-832614387
+
+/*
+ 
+resource "kubernetes_manifest" "kubernetes-secret-store" {
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = "SecretStore"
+      metadata = {
+          name = "${var.k8s_cluster_name}-common-secret-store"
+          namespace =  var.app_namespace
+      }
+      spec = {
+          provider = {
+            aws = {
+              service = "SecretsManager"
+              region = local.aws_region_name
+              auth = {
+                jwt = {
+                  serviceAccountRef = {
+                    name = local.service_account_name
+                  }
+                }
+              }
+            }
+          }
+      }
+  }
+}
+ 
+ */
 
  
 

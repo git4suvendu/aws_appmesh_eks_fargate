@@ -6,7 +6,7 @@
 
 resource "aws_iam_role" "this" {
   name        = local.service_account_name
-  description = "Permissions required by the Kubernetes External Secrets to do its job."
+  description = "Permissions required by the Kubernetes Secret Store to do its job."
   path        = null
   tags = var.aws_tags
   force_detach_policies = true
@@ -16,7 +16,7 @@ resource "aws_iam_role" "this" {
 
 resource "aws_iam_policy" "this" {
   name        = local.service_account_name
-  description = format("Permissions that are required to manage AWS Secrets Manager.")
+  description = format("Permissions that are required to retrieve scecrets from AWS Secrets Manager by Kubernetes Secret Store.")
  
     policy = jsonencode({
     "Version": "2012-10-17",
@@ -28,11 +28,11 @@ resource "aws_iam_policy" "this" {
                 "secretsmanager:GetSecretValue",
                 "secretsmanager:DescribeSecret"
             ],
-            "Resource": "arn:aws:secretsmanager:${local.aws_region_name}:${data.aws_caller_identity.current.account_id}:secret:*"   # It will allow access to all the secrets in the AWS Secrets manager within the region.
+            # It will allow access to all the secrets in the AWS Secrets manager within the region.
+            "Resource": "arn:aws:secretsmanager:${local.aws_region_name}:${data.aws_caller_identity.current.account_id}:secret:*"   
         }
       ]
     })
-
     tags = {
             Name  = "${var.k8s_cluster_name}-secrets-manager-iam"
         }
@@ -63,7 +63,6 @@ resource "kubernetes_service_account" "this" {
       "app.kubernetes.io/managed-by" =  "terraform"  
     }
   }
-
    depends_on = [ kubernetes_namespace.application_namespace , helm_release.external_secrets   ]
 
 }
@@ -82,14 +81,13 @@ resource "kubernetes_cluster_role" "this" {
   rule {
     api_groups = [
       "",
-      "extensions",
+      "extensions"
     ]
 
     resources = [
+      "secrets",
       "configmaps",
-      "endpoints",
-      "events",
-      "services",
+      "services"
     ]
 
     verbs = [
@@ -97,29 +95,26 @@ resource "kubernetes_cluster_role" "this" {
       "get",
       "list",
       "update",
-      "watch",
-      "patch",
+      "watch"
     ]
   }
 
   rule {
     api_groups = [
       "",
-      "extensions",
+      "extensions"
     ]
 
     resources = [
       "nodes",
       "pods",
-      "secrets",
-      "services",
-      "namespaces",
+      "namespaces"
     ]
 
     verbs = [
       "get",
       "list",
-      "watch",
+      "watch"
     ]
   }
 }
