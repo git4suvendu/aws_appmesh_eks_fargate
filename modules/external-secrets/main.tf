@@ -11,18 +11,6 @@ terraform {
  
 
  
-resource "kubernetes_namespace" "application_namespace" {
-  metadata {
-    labels = {
-      "app.kubernetes.io/name"       = "application_namespace"
-      "app.kubernetes.io/component"  = "secret_store"
-      "app.kubernetes.io/managed-by" = "terraform" # "helm" #
-    }
-    name = var.app_namespace #var.k8s_namespace
-  }
-}
- 
-
 
 
 # Creating Kubernetes SecretStore in the cluster so that Secrets can synchronise from AWS Secrets Manager

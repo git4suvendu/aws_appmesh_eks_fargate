@@ -80,7 +80,7 @@ module "aws_appmesh_controller" {
 }
 
 module "secrets_manager" {
-  source  = "./modules/secrets_manager"
+  source  = "./modules/external-secrets"
   k8s_namespace    =  "external-secrets"
   app_namespace  =  var.fargate_app_namespace[0]
   k8s_cluster_name = module.eks.eks_cluster_name
