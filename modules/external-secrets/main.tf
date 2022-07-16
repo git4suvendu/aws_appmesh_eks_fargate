@@ -67,11 +67,11 @@ spec:
   - secretKey:  "application-username"
     remoteRef:
       key: "test/application/credentials" #AWS Secrets Manager secret name
-      property:  "app_username" #AWS Secrets Manager secret key
+      property:  "app-username" #AWS Secrets Manager secret key
   - secretKey: "application-password"
     remoteRef:
       key: "test/application/credentials" #AWS Secrets Manager secret name
-      property: "app_password" #AWS Secrets Manager secret key
+      property: "app-password" #AWS Secrets Manager secret key
 YAML
 
 depends_on = [ kubectl_manifest.kubernetes-secret-store , time_sleep.wait_30_seconds_for_secret_store  ]
