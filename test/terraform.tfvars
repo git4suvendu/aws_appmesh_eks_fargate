@@ -18,3 +18,6 @@ cidr_block_nat_gw            =  "0.0.0.0/0"
 fargate_app_namespace        =  ["ns-fargate-app", "ns-fargate-app2", "my-apps"]
 github_runner_base_path      = "/home/runner/"
 
+
+
+
