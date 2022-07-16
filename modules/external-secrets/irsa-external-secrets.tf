@@ -50,7 +50,7 @@ resource "kubernetes_service_account" "this" {
   automount_service_account_token = true
   metadata {
     name      =  local.service_account_name
-    namespace =   var.app_namespace # var.k8s_namespace
+    namespace =   var.app_namespace  
     annotations = {
       # This annotation is only used when running on EKS which can
       # use IAM roles for service accounts.
@@ -59,14 +59,12 @@ resource "kubernetes_service_account" "this" {
     }
     labels = {
       "app.kubernetes.io/name"       = local.service_account_name
-      "app.kubernetes.io/component"  = "external_secrets"
-      "app.kubernetes.io/managed-by" =  "terraform" # "helm" 
-      "meta.helm.sh/release-name"   = "external_secrets"
-      "meta.helm.sh/release-namespace" =var.k8s_namespace
+      "app.kubernetes.io/component"  = "secret-store"
+      "app.kubernetes.io/managed-by" =  "terraform"  
     }
   }
 
-   depends_on = [ kubernetes_namespace.application_namespace   ]
+   depends_on = [ kubernetes_namespace.application_namespace , helm_release.external_secrets   ]
 
 }
 
@@ -76,8 +74,8 @@ resource "kubernetes_cluster_role" "this" {
 
     labels = {
       "app.kubernetes.io/name"       = local.service_account_name
-      "app.kubernetes.io/component"  = "external_secrets"
-      "app.kubernetes.io/managed-by" = "terraform" # "helm" 
+      "app.kubernetes.io/component"  = "secret-store"
+      "app.kubernetes.io/managed-by" = "terraform"  
     }
   }
 
@@ -132,8 +130,8 @@ resource "kubernetes_cluster_role_binding" "this" {
 
     labels = {
       "app.kubernetes.io/name"       = local.service_account_name
-      "app.kubernetes.io/component"  = "external_secrets"
-      "app.kubernetes.io/managed-by" = "terraform" # "helm" 
+      "app.kubernetes.io/component"  = "secret-store"
+      "app.kubernetes.io/managed-by" = "terraform" 
     }
   }
 
@@ -150,7 +148,7 @@ resource "kubernetes_cluster_role_binding" "this" {
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
 
- #  depends_on = [  kubernetes_namespace.application_namespace, kubernetes_namespace.external_secrets, kubernetes_service_account.this ]
+  depends_on = [  kubernetes_service_account.this , kubernetes_cluster_role.this ]
 
 }
 

@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "external_secrets" {
+/*resource "kubernetes_namespace" "external_secrets" {
   metadata {
     labels = {
       "app.kubernetes.io/name"       = local.service_account_name
@@ -9,7 +9,7 @@ resource "kubernetes_namespace" "external_secrets" {
     name =  var.k8s_namespace
   }
 }
- 
+ */
 
 resource "kubernetes_namespace" "application_namespace" {
   metadata {

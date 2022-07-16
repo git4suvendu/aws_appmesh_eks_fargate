@@ -41,7 +41,7 @@ resource "helm_release" "external_secrets" {
       type = "string"
   }
   
-  depends_on = [ kubernetes_namespace.external_secrets  ]
+ # depends_on = [ kubernetes_namespace.external_secrets  ]
 
 }
 
