@@ -11,6 +11,7 @@ resource "time_sleep" "wait_60_seconds_for_external_secret_controller" {
 
 
 resource "kubectl_manifest" "kubernetes-secret-store" {
+    wait = true
     yaml_body = <<YAML
 apiVersion: external-secrets.io/v1beta1
 kind: SecretStore
@@ -49,6 +50,7 @@ resource "time_sleep" "wait_30_seconds_for_secret_store" {
  
  
 resource "kubectl_manifest" "kubernetes-external-secret" {
+    wait = true
     yaml_body = <<YAML
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
