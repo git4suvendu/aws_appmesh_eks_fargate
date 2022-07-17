@@ -5,7 +5,7 @@ on:
     paths:
       - '*/**'
   pull_request:
-    branches: [ master ]
+    branches: [ kms-aws ]
 #defaults:
 #  run:
 #    shell: bash
