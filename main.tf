@@ -1,6 +1,4 @@
 
-
-
 module "vpc" {
     source                              = "./modules/vpc"
     environment                         =  var.environment
@@ -17,17 +15,30 @@ module "vpc" {
 }
 
 
-module "eks" {
-    source                              =  "./modules/eks"
+module kms_aws {
+    source                              =  "./modules/kms-aws"
     cluster_name                        =  var.cluster_name
-    cluster_version                     =  var.cluster_version
     environment                         =  var.environment
-    #eks_node_group_instance_types       =  var.eks_node_group_instance_types
-    private_subnets                     =  module.vpc.aws_subnets_private
-    public_subnets                      =  module.vpc.aws_subnets_public
-    fargate_app_namespace               =  var.fargate_app_namespace
 
     depends_on = [module.vpc]
+}
+
+
+module "eks" {
+    source                                        =  "./modules/eks"
+    cluster_name                                  =  var.cluster_name
+    cluster_version                               =  var.cluster_version
+    environment                                   =  var.environment
+    private_subnets                               =  module.vpc.aws_subnets_private
+    public_subnets                                =  module.vpc.aws_subnets_public
+    fargate_app_namespace                         =  var.fargate_app_namespace
+    eks_kms_secret_encryption_key_arn             =  module.kms_aws.eks_kms_secret_encryption_key_arn  # KMS Key ID
+    eks_kms_secret_encryption_alias_arn           =  module.kms_aws.eks_kms_secret_encryption_alias_arn  
+	  eks_kms_cloudwatch_logs_encryption_key_arn    =  module.kms_aws.eks_kms_cloudwatch_logs_encryption_key_arn # KMS Key ID
+    eks_kms_cloudwatch_logs_encryption_alias_arn  =  module.kms_aws.eks_kms_cloudwatch_logs_encryption_alias_arn 
+
+
+    depends_on = [module.vpc, module.kms_aws]
 }
 
 module "fargate_fluentbit" {
@@ -46,8 +57,8 @@ module "coredns_patching" {
   k8s_cluster_name = module.eks.eks_cluster_name
   user_profile =   var.user_profile
   user_os = var.user_os
-  depends_on = [module.eks, module.fargate_fluentbit]
 
+  depends_on = [module.eks, module.fargate_fluentbit]
 }
 
 
@@ -57,7 +68,7 @@ module "aws_alb_controller" {
   k8s_cluster_type = var.cluster_type
   k8s_namespace    = "kube-system"
   k8s_cluster_name = module.eks.eks_cluster_name
- # alb_controller_depends_on =  ""
+
   depends_on = [module.eks, module.coredns_patching]
 }
 
@@ -67,6 +78,7 @@ module "eks_kubernetes_addons" {
   k8s_cluster_type = var.cluster_type
   k8s_namespace    = "kube-system"
   k8s_cluster_name = module.eks.eks_cluster_name
+
   depends_on = [module.eks, module.coredns_patching]
 }
 
@@ -76,6 +88,7 @@ module "aws_appmesh_controller" {
   source  = "./modules/aws-appmesh-controller"
   k8s_namespace    = "appmesh-system"
   k8s_cluster_name = module.eks.eks_cluster_name
+
   depends_on =  [module.eks, module.coredns_patching]  
 }
 
@@ -84,8 +97,18 @@ module "external_secrets" {
   k8s_namespace    =  "external-secrets"
   app_namespace  =  var.fargate_app_namespace[0]
   k8s_cluster_name = module.eks.eks_cluster_name
+
   depends_on =  [ module.eks, module.coredns_patching]  
 }
+
+
+module "kubernetes_app_helm" {
+    source                      =  "./modules/kubernetes-app-helm"
+    app_namespace               =  var.fargate_app_namespace[0]
+
+  depends_on = [module.eks, module.aws_alb_controller, module.external_secrets]
+}
+
 
 
 /*
@@ -98,11 +121,3 @@ module "kubernetes_app" {
 }
 
 */
-
-module "kubernetes_app_helm" {
-    source                      =  "./modules/kubernetes-app-helm"
-    app_namespace               =  var.fargate_app_namespace[0]
-
-  depends_on = [module.eks, module.aws_alb_controller, module.external_secrets]
-}
-
