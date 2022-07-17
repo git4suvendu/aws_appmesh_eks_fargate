@@ -1,7 +1,6 @@
 data "aws_iam_policy_document" "eks_use_kms_policy" {
 	  statement {
-	    sid = "EKS_KMS_Usage_Policy"
-	
+	    sid = "KMSUsagePolicy"
 	    actions = [
 	      "kms:Encrypt",
 	      "kms:Decrypt",
