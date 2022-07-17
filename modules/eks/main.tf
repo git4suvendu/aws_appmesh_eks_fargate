@@ -3,8 +3,6 @@
 /* =====================
 Creating EKS Cluster 
 ========================*/
-
-
 resource "aws_eks_cluster" "eks_cluster" {
   name     = "${var.cluster_name}-${var.environment}"
    
@@ -73,30 +71,12 @@ resource "aws_iam_policy" "AmazonEKSClusterCloudWatchMetricsPolicy" {
 EOF
 }
 
-# AWS IAM Policy for KMS usage. Required for EKS to access KMS Key.
-resource "aws_iam_policy" "EKS_KMS_Usage_Policy" {
+ # AWS IAM Policy for KMS usage. Required for EKS to access KMS Key.
+ resource "aws_iam_policy" "EKS_KMS_Usage_Policy" {
   name   = substr("${var.cluster_name}-${var.environment}-AmazonEKS-KMS-UsagePolicy",0,64)
-  policy = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-          "Sid": "AWS-KMS-Usage" ,
-          "Effect": "Allow" ,             
-          "Action": [
-              "kms:Encrypt",
-	            "kms:Decrypt",
-	            "kms:GenerateDataKey",
-	            "kms:DescribeKey"
-            ],
-            "Resource": ${var.eks_kms_secret_encryption_key_arn}             
-        }
-    ]
-  }
-  EOF
+  policy = data.aws_iam_policy_document.eks_use_kms_policy.json
 }
 
- 
 
 /* ==================================
 Creating IAM Role for EKS Cluster 
@@ -140,11 +120,9 @@ resource "aws_iam_role_policy_attachment" "AmazonEKSVPCResourceController1" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
   role       = aws_iam_role.eks_cluster_role.name
 }
+  
  
 resource "aws_iam_role_policy_attachment" "eks_kms_usage" {
   policy_arn = aws_iam_policy.EKS_KMS_Usage_Policy.arn
   role       = aws_iam_role.eks_cluster_role.name
 }
-
-
- 
