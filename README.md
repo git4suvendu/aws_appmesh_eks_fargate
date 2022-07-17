@@ -1,4 +1,4 @@
-# AWS EKS Fargate setup with terraform
+# AWS EKS Fargate with AppMesh, External Secret setup with terraform
 The Terraform code repo will deploy AWS EKS on Fargate. Managed node groups have not been used in EKS to deploy different pods.
 It will also deploy an AWS Load Balancer Controller and a sample game app which will be
 exposed externally using an AWS ALB Ingress load balancer.
