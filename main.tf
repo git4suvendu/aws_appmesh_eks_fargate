@@ -84,7 +84,7 @@ module "external_secrets" {
   k8s_namespace    =  "external-secrets"
   app_namespace  =  var.fargate_app_namespace[0]
   k8s_cluster_name = module.eks.eks_cluster_name
-  depends_on =  [module.eks, module.coredns_patching]  
+  depends_on =  [ module.coredns_patching]  
 }
 
 
