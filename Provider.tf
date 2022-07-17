@@ -20,7 +20,7 @@ provider "aws" {
 
 
 
-/*terraform {
+ terraform {
   backend "s3" {
     bucket = "suvendu-terraform-state" #var.s3_bucket_name
     key    = "eks/test/terraform.tfstate" #var.tfstate_file_path
@@ -28,7 +28,7 @@ provider "aws" {
     encrypt= true
   }
 }
-*/
+ 
 
 
 provider "kubernetes" {
