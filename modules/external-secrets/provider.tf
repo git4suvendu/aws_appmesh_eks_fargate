@@ -1,5 +1,4 @@
 
-/*
 terraform {
   required_providers {
     kubectl = {
@@ -9,4 +8,4 @@ terraform {
   }
 }
  
-*/
+

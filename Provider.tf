@@ -20,7 +20,7 @@ provider "aws" {
 
 
 
-terraform {
+/*terraform {
   backend "s3" {
     bucket = "suvendu-terraform-state" #var.s3_bucket_name
     key    = "eks/test/terraform.tfstate" #var.tfstate_file_path
@@ -28,7 +28,7 @@ terraform {
     encrypt= true
   }
 }
-
+*/
 
 
 provider "kubernetes" {
@@ -50,7 +50,7 @@ provider "helm" {
 }
 
  
- provider "kubectl" {
+  provider "kubectl" {
   # Configuration options
   host                   = data.aws_eks_cluster.eks_cluster.endpoint
   token                  = data.aws_eks_cluster_auth.aws_iam_authenticator.token
