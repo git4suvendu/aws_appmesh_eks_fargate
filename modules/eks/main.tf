@@ -89,7 +89,7 @@ resource "aws_iam_policy" "EKS_KMS_Usage_Policy" {
 	            "kms:GenerateDataKey",
 	            "kms:DescribeKey"
             ],
-            "Resource": "${var.eks_kms_secret_encryption_key_arn}"             
+            "Resource": ${var.eks_kms_secret_encryption_key_arn}             
         }
     ]
   }
