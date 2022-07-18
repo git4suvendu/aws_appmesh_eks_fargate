@@ -1,0 +1,109 @@
+name: "Terraform Deployment"
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '*/**'
+  pull_request:
+    branches: [ update-kubeconfig ]
+permissions: write-all
+
+jobs:
+  terraform-infra:
+    name:   ${{matrix.runner}} - ${{matrix.environment }}
+    runs-on: [ '${{ matrix.runner }}']
+    strategy:
+      max-parallel: 1
+      matrix:
+         include:
+           - environment: test
+             runner: ubuntu-latest
+    env:
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         AWS_TOKEN: ${{ secrets.AWS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'v1.22.10'
+        id: install
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_TOKEN }}
+          aws-region: eu-west-2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+      - uses: actions/checkout@v1
+
+      - name: Download KubeConfig file from Artifacts
+        if: "!contains(github.event.head_commit.message, 'destroy')"
+	      id: download_kube_config
+	      continue-on-error: true
+	      run: gh run download -n eks-cluster-kubeconfig -D ~/.kube
+	      env:
+	        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: View KubeConfig file after download
+        if: "!contains(github.event.head_commit.message, 'destroy')"
+        run: ls -lrt /home/runner/.kube/ && cat /home/runner/.kube/config
+
+      - name: Format Terraform
+        run: terraform fmt
+
+      - name: Terraform Init
+        id: init
+        run: |
+           rm -rf .terraform
+           terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: "!contains(github.event.head_commit.message, 'destroy')"
+        id: plan
+        run: TF_LOG=DEBUG terraform plan -input=false -var-file=${{ matrix.environment }}/terraform.tfvars -no-color
+
+      - name: Terraform apply
+        if: "!contains(github.event.head_commit.message, 'destroy')"
+        id: apply
+        run: TF_LOG=DEBUG terraform apply -auto-approve -input=false -var-file=${{matrix.environment }}/terraform.tfvars
+
+      - name: View KubeConfig file before upload
+        if: "!contains(github.event.head_commit.message, 'destroy')"
+        run: ls -lrt /home/runner/.kube/ && cat /home/runner/.kube/config
+
+      - name: Upload KubeConfig file to Artifacts
+        if: "!contains(github.event.head_commit.message, 'destroy')"
+	      uses: actions/upload-artifact@v2
+	      continue-on-error: true
+	      with:
+	          name: eks-cluster-kubeconfig
+	          path: /home/runner/.kube/config
+  
+      - name: Terraform Destroy
+        if: "contains(github.event.head_commit.message, 'destroy')"
+        id: destroy
+        run: TF_LOG=DEBUG terraform destroy -auto-approve -input=false -var-file=${{ matrix.environment }}/terraform.tfvars
+  comment:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thanks for reporting!'
+            })

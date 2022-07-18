@@ -126,3 +126,20 @@ resource "aws_iam_role_policy_attachment" "eks_kms_usage" {
   policy_arn = aws_iam_policy.EKS_KMS_Usage_Policy.arn
   role       = aws_iam_role.eks_cluster_role.name
 }
+
+
+# Update the Kubeconfig file in the GitHub Actions Runner
+resource "null_resource" "eks_get_config_exec" {
+	
+	  triggers = {
+	    always_run = timestamp()
+	  }
+	  provisioner "local-exec" {
+	    command = "aws eks --region ${data.aws_region.current.name} update-kubeconfig --name ${aws_eks_cluster.eks_cluster.name}"
+	  }
+	
+	  depends_on = [
+	    aws_eks_cluster.eks_cluster
+	  ]
+	}
+
