@@ -54,8 +54,25 @@ jobs:
 
       - name: View KubeConfig file after download
         if: "!contains(github.event.head_commit.message, 'destroy')"
-        continue-on-error: true
-        run: ls -lrt /home/runner/.kube/ && cat /home/runner/.kube/config
+        run: |
+          if [ -d /home/runner/.kube ];
+          then
+            echo ".kube exists in /home/runner"
+            if [ -f /home/runner/.kube/config ];
+            then
+              echo "config file exists in /home/runner/.kube/"
+              ls -lrt /home/runner/.kube/ && cat /home/runner/.kube/config
+            else
+              echo "config file does not exists in /home/runner/.kube/ , creating the dummy config file"
+              touch /home/runner/.kube/config
+              chmod -R 777 /home/runner/.kube/
+            fi
+          else
+            echo ".kube directory does not exists in /home/runner/, creating the directory and dummy config file"
+            mkdir /home/runner/.kube/
+            touch /home/runner/.kube/config
+            chmod -R 777 /home/runner/.kube/
+          fi
 
       - name: Format Terraform
         run: terraform fmt
