@@ -5,11 +5,8 @@ on:
     paths:
       - '*/**'
   pull_request:
-    branches: [ <branch name> ] # input your banch name here
-#defaults:
-#  run:
-#    shell: bash
-#    working-directory: ./
+    branches: [ branch_name ] # input your banch name here
+
 jobs:
   terraform-infra:
     name:   ${{matrix.runner}} - ${{matrix.environment }}

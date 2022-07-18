@@ -46,11 +46,11 @@ jobs:
 
       - name: Download KubeConfig file from Artifacts
         if: "!contains(github.event.head_commit.message, 'destroy')"
-	      id: download_kube_config
-	      continue-on-error: true
-	      run: gh run download -n eks-cluster-kubeconfig -D ~/.kube
-	      env:
-	        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: download_kube_config
+        continue-on-error: true
+        run: gh run download -n eks-cluster-kubeconfig -D ~/.kube
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: View KubeConfig file after download
         if: "!contains(github.event.head_commit.message, 'destroy')"
@@ -84,11 +84,11 @@ jobs:
 
       - name: Upload KubeConfig file to Artifacts
         if: "!contains(github.event.head_commit.message, 'destroy')"
-	      uses: actions/upload-artifact@v2
-	      continue-on-error: true
-	      with:
-	          name: eks-cluster-kubeconfig
-	          path: /home/runner/.kube/config
+        uses: actions/upload-artifact@v2
+        continue-on-error: true
+        with:
+           name: eks-cluster-kubeconfig
+           path: /home/runner/.kube/config
   
       - name: Terraform Destroy
         if: "contains(github.event.head_commit.message, 'destroy')"
