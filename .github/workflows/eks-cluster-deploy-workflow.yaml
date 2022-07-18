@@ -45,7 +45,6 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Download KubeConfig file from Artifacts
-        if: "!contains(github.event.head_commit.message, 'destroy')"
         id: download_kube_config
         continue-on-error: true
         run: gh run download -n eks-cluster-kubeconfig -D ~/.kube
@@ -53,7 +52,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: View KubeConfig file after download
-        if: "!contains(github.event.head_commit.message, 'destroy')"
         run: |
           if [ -d /home/runner/.kube ];
           then
@@ -97,7 +95,6 @@ jobs:
         run: TF_LOG=DEBUG terraform apply -auto-approve -input=false -var-file=${{matrix.environment }}/terraform.tfvars
 
       - name: View KubeConfig file before upload
-        if: "!contains(github.event.head_commit.message, 'destroy')"
         run: ls -lrt /home/runner/.kube/ && cat /home/runner/.kube/config
 
       - name: Upload KubeConfig file to Artifacts
