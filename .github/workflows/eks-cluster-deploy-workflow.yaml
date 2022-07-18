@@ -54,6 +54,7 @@ jobs:
 
       - name: View KubeConfig file after download
         if: "!contains(github.event.head_commit.message, 'destroy')"
+        continue-on-error: true
         run: ls -lrt /home/runner/.kube/ && cat /home/runner/.kube/config
 
       - name: Format Terraform
